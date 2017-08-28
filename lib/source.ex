@@ -1,19 +1,30 @@
 defmodule Parser.Source do
-  alias Parser.Corp
-  alias Parser.Data
-
   require Parser.Macros
 
   defstruct [:system_id, :version, :name, :corp, :source_data]
 
-  # @child_tags %{
-  #   "\"VERS\"" => "version",
-  #   "\"NAME\"" => "name"
-  #   "CORP" => {"corp", Corp},
-  #   "DATA" => {"data", Data}
-  # }
+  @leaf_nodes %{
+    "VERS" => %{
+      key: :version
+    },
+    "NAME" => %{
+      key: :name
+    }
+  }
 
-  # Macros.gen_funs(@child_tags)
+  @child_nodes %{
+    "CORP" => %{
+      module: Parser.Corp,
+      key: :corp
+    },
+    "DATA" => %{
+      module: Parser.Data,
+      key: :data
+    }
+  }
+
+  Parser.Macros.build_leaf_processors @leaf_nodes
+  Parser.Macros.build_child_processors @child_nodes
 
   def process_lines([source_line | rest]) do
     source = %__MODULE__{
@@ -29,23 +40,4 @@ defmodule Parser.Source do
   do
     {lines, source}
   end
-
-  defp process_lines([%{tag: "VERS", value: version} | rest], parent_level, source)  do
-    process_lines(rest, parent_level, %{source | version: version})
-  end
-
-  defp process_lines([%{tag: "NAME", value: name} | rest], parent_level, source) do
-    process_lines(rest, parent_level, %{source | name: name})
-  end
-
-  defp process_lines([%{tag: "CORP"} | _rest] = lines, parent_level, source) do
-    {lines, corp} = Corp.process_lines(lines)
-    process_lines(lines, parent_level, %{source | corp: corp})
-  end
-
-  defp process_lines([%{tag: "DATA"} | _rest] = lines, parent_level, source) do
-    {lines, data} = Data.process_lines(lines)
-    process_lines(lines, parent_level, %{source | source_data: data})
-  end
-
 end
