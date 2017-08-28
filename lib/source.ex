@@ -23,21 +23,11 @@ defmodule Parser.Source do
     }
   }
 
-  Parser.Macros.build_leaf_processors @leaf_nodes
-  Parser.Macros.build_child_processors @child_nodes
+  @definition %{
+    root_value: :system_id,
+    leaf_nodes: @leaf_nodes,
+    child_nodes: @child_nodes
+  }
 
-  def process_lines([source_line | rest]) do
-    source = %__MODULE__{
-      system_id: source_line.value
-    }
-
-    process_lines(rest, source_line.level, source)
-  end
-
-  defp process_lines([], _parent_level, source), do: {[], source}
-
-  defp process_lines([%{level: level} | _rest] = lines, parent_level, source) when level == parent_level
-  do
-    {lines, source}
-  end
+  Parser.Macros.build_node_processor @definition
 end

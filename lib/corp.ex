@@ -1,20 +1,20 @@
 defmodule Parser.Corp do
   defstruct [:name, :address]
 
-  alias Parser.Address
+  require Parser.Macros
 
-  def process_lines([root | rest]) do
-    corp = %__MODULE__{
-      name: root.value
+  @child_nodes %{
+    "ADDR" => %{
+      module: Parser.Address,
+      key: :address
     }
+  }
 
-    process_lines(rest, root.level, corp)
-  end
+  @definition %{
+    root_value: :name,
+    leaf_nodes: %{},
+    child_nodes: @child_nodes
+  }
 
-  defp process_lines([], _root_level, corp), do: {[], corp}
-  defp process_lines([%{level: level} | _rest] = lines, root_level, corp) when level <= root_level, do: {lines, corp}
-  defp process_lines([%{tag: "ADDR"} | _rest] = lines, _root_level, corp) do
-    {lines, address} = Address.process_lines(lines)
-    {lines, %{corp | address: address}}
-  end
+  Parser.Macros.build_node_processor @definition
 end

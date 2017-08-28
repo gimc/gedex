@@ -19,4 +19,23 @@ defmodule Parser.Macros do
       end)
     end
   end
+
+  defmacro build_node_processor(definition) do
+    quote bind_quoted: [definition: definition] do
+      Parser.Macros.build_leaf_processors definition.leaf_nodes
+      Parser.Macros.build_child_processors definition.child_nodes
+
+      def process_lines([source_line | rest]) do
+        source = Map.put(%__MODULE__{}, unquote(definition.root_value), source_line.value)
+        process_lines(rest, source_line.level, source)
+      end
+
+      defp process_lines([], _parent_level, source), do: {[], source}
+
+      defp process_lines([%{level: level} | _rest] = lines, parent_level, source) when level <= parent_level
+      do
+        {lines, source}
+      end
+    end
+  end
 end
