@@ -31,7 +31,6 @@ defmodule SourceTest do
     {lines, source} = Source.process_lines(lines)
 
     next_line = List.first(lines)
-
     assert next_line.tag == "DEST"
     assert source.system_id == "Test_Source"
     assert source.version == "1.0"

@@ -26,7 +26,13 @@ defmodule Parser.Macros do
       Parser.Macros.build_child_processors definition.child_nodes
 
       def process_lines([source_line | rest]) do
-        source = Map.put(%__MODULE__{}, unquote(definition.root_value), source_line.value)
+        source =
+          if (unquote(definition.root_value) != nil) do
+            Map.put(%__MODULE__{}, unquote(definition.root_value), source_line.value)
+          else
+            %__MODULE__{}
+          end
+
         process_lines(rest, source_line.level, source)
       end
 
