@@ -3,31 +3,17 @@ defmodule Parser.Source do
 
   defstruct [:system_id, :version, :name, :corp, :source_data]
 
-  @leaf_nodes %{
-    "VERS" => %{
-      key: :version
-    },
-    "NAME" => %{
-      key: :name
-    }
-  }
-
-  @child_nodes %{
-    "CORP" => %{
-      module: Parser.Corp,
-      key: :corp
-    },
-    "DATA" => %{
-      module: Parser.Data,
-      key: :source_data
-    }
+  @nodes %{
+    "VERS" => [key: :version],
+    "NAME" => [key: :name],
+    "CORP" => [key: :corp, module: Parser.Corp],
+    "DATA" => [key: :data, module: Parser.Data]
   }
 
   @definition %{
     root_value: :system_id,
-    leaf_nodes: @leaf_nodes,
-    child_nodes: @child_nodes
+    nodes: @nodes
   }
 
-  Parser.Macros.build_node_processor @definition
+  Parser.Macros.build_model_processor @definition
 end

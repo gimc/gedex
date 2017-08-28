@@ -3,20 +3,15 @@ defmodule Parser.Data do
 
   require Parser.Macros
 
-  @leaf_nodes %{
-    "DATE" => %{
-      key: :date
-    },
-    "COPR" => %{
-      key: :copyright
-    }
+  @nodes %{
+    "DATE" => [key: :date],
+    "COPR" => [key: :copyright]
   }
 
   @definition %{
     root_value: :name,
-    leaf_nodes: @leaf_nodes,
-    child_nodes: %{}
+    nodes: @nodes
   }
 
-  Parser.Macros.build_node_processor @definition
+  Parser.Macros.build_model_processor @definition
 end

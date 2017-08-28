@@ -3,18 +3,14 @@ defmodule Parser.Corp do
 
   require Parser.Macros
 
-  @child_nodes %{
-    "ADDR" => %{
-      module: Parser.Address,
-      key: :address
-    }
+  @nodes %{
+    "ADDR" => [key: :address, module: Parser.Address]
   }
 
   @definition %{
     root_value: :name,
-    leaf_nodes: %{},
-    child_nodes: @child_nodes
+    nodes: @nodes
   }
 
-  Parser.Macros.build_node_processor @definition
+  Parser.Macros.build_model_processor @definition
 end

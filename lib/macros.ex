@@ -1,33 +1,29 @@
 defmodule Parser.Macros do
-  defmacro build_leaf_processors(tags) do
-    quote bind_quoted: [tags: tags] do
-      Enum.each(tags, fn {k, v} ->
-        defp process_lines([%{tag: unquote(k), value: value, xref_id: ""} | rest], parent_level, source) do
-          process_lines(rest, parent_level, Map.put(source, unquote(v.key), value))
-        end
 
-        defp process_lines([%{tag: unquote(k), value: "", xref_id: xref_id} | rest], parent_level, source) do
-          process_lines(rest, parent_level, Map.put(source, unquote(v.key), xref_id))
-        end
-      end)
-    end
-  end
+  defmacro build_node_processors(nodes) do
+    quote bind_quoted: [nodes: nodes] do
+      Enum.each(nodes, fn {tag, options} ->
+        if (options[:module]) do
+          defp process_lines([%{tag: unquote(tag)} | _rest] = lines, parent_level, source) do
+            {lines, value} = unquote(options[:module]).process_lines(lines)
+            process_lines(lines, parent_level, Map.put(source, unquote(options[:key]), value))
+          end
+        else
+          defp process_lines([%{tag: unquote(tag), value: value, xref_id: ""} | rest], parent_level, source) do
+            process_lines(rest, parent_level, Map.put(source, unquote(options[:key]), value))
+          end
 
-  defmacro build_child_processors(tags) do
-    quote bind_quoted: [tags: tags] do
-      Enum.each(tags, fn {k, v} ->
-        defp process_lines([%{tag: unquote(k)} | _rest] = lines, parent_level, source) do
-          {lines, value} = unquote(v.module).process_lines(lines)
-          process_lines(lines, parent_level, Map.put(source, unquote(v.key), value))
+          defp process_lines([%{tag: unquote(tag), value: "", xref_id: xref_id} | rest], parent_level, source) do
+            process_lines(rest, parent_level, Map.put(source, unquote(options[:key]), xref_id))
+          end
         end
       end)
     end
   end
 
-  defmacro build_node_processor(definition) do
+  defmacro build_model_processor(definition) do
     quote bind_quoted: [definition: definition] do
-      Parser.Macros.build_leaf_processors definition.leaf_nodes
-      Parser.Macros.build_child_processors definition.child_nodes
+      Parser.Macros.build_node_processors definition.nodes
 
       def process_lines([source_line | rest]) do
         source =
@@ -48,4 +44,5 @@ defmodule Parser.Macros do
       end
     end
   end
+
 end

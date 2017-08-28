@@ -3,27 +3,16 @@ defmodule Parser.Header do
 
   require Parser.Macros
 
-  @child_nodes %{
-    "SOUR" => %{
-      module: Parser.Source,
-      key: :source
-    }
-  }
-
-  @leaf_nodes %{
-    "DEST" => %{
-      key: :dest
-    },
-    "SUBM" => %{
-      key: :subm
-    }
+  @nodes %{
+    "SOUR" => [key: :source, module: Parser.Source],
+    "DEST" => [key: :dest],
+    "SUBM" => [key: :subm]
   }
 
   @definition %{
     root_value: nil,
-    leaf_nodes: @leaf_nodes,
-    child_nodes: @child_nodes
+    nodes: @nodes
   }
 
-  Parser.Macros.build_node_processor @definition
+  Parser.Macros.build_model_processor @definition
 end
