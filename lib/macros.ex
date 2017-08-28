@@ -2,8 +2,12 @@ defmodule Parser.Macros do
   defmacro build_leaf_processors(tags) do
     quote bind_quoted: [tags: tags] do
       Enum.each(tags, fn {k, v} ->
-        defp process_lines([%{tag: unquote(k), value: value} | rest], parent_level, source) do
+        defp process_lines([%{tag: unquote(k), value: value, xref_id: ""} | rest], parent_level, source) do
           process_lines(rest, parent_level, Map.put(source, unquote(v.key), value))
+        end
+
+        defp process_lines([%{tag: unquote(k), value: "", xref_id: xref_id} | rest], parent_level, source) do
+          process_lines(rest, parent_level, Map.put(source, unquote(v.key), xref_id))
         end
       end)
     end

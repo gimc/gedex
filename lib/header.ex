@@ -13,6 +13,9 @@ defmodule Parser.Header do
   @leaf_nodes %{
     "DEST" => %{
       key: :dest
+    },
+    "SUBM" => %{
+      key: :subm
     }
   }
 

@@ -19,7 +19,7 @@ defmodule Parser.Source do
     },
     "DATA" => %{
       module: Parser.Data,
-      key: :data
+      key: :source_data
     }
   }
 
