@@ -12,12 +12,12 @@ defmodule Parser.Line do
 
   def from_string(string) do
     captures = Regex.named_captures(@regex, string, capture: :all_but_first)
-    
+
     %__MODULE__{
       level: String.to_integer(captures["level"], 10),
       xref_id: String.trim(captures["xref_id"]),
       tag: String.trim(captures["tag"]),
-      value: String.trim(captures["value"])
+      value: String.trim_leading(captures["value"])
     }
   end
 
