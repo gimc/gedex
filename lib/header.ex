@@ -6,7 +6,15 @@ defmodule Parser.Header do
   @nodes %{
     "SOUR" => [key: :source, module: Parser.Source],
     "DEST" => [key: :dest],
-    "SUBM" => [key: :subm]
+    "SUBM" => [key: :subm],
+    "SUBN" => [key: :subn],
+    "FILE" => [key: :file],
+    "COPR" => [key: :copr],
+    # "GEDC" => [key: :gedc, module: Parser.Gedc],
+    # "CHAR" => [key: :char, module: Parser.Char],
+    "LANG" => [key: :lang]
+    # "PLAC" => [key: :plac, module: Parser.Plac],
+    # "NOTE" => [key: :note, module: Parser.Note],
   }
 
   @definition %{
