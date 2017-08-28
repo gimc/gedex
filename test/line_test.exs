@@ -21,7 +21,7 @@ defmodule LineTest do
     line = Line.from_string("0 @1@ INDI")
 
     assert line.level == 0
-    assert line.xref_id == "@1@"
+    assert line.xref_id == "1"
     assert line.tag == "INDI"
   end
 

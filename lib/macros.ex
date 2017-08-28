@@ -10,6 +10,10 @@ defmodule Parser.Macros do
           end
         else
           defp process_lines([%{tag: unquote(tag), value: value, xref_id: ""} | rest], parent_level, source) do
+            value_is_foreign_key? = fn ->
+              Keyword.has_key?(unquote(options), :foreign_key) && unquote(options[:foreign_key])
+            end
+            value = if value_is_foreign_key?.(), do: String.trim(value, "@"), else: value
             process_lines(rest, parent_level, Map.put(source, unquote(options[:key]), value))
           end
 
@@ -25,15 +29,12 @@ defmodule Parser.Macros do
     quote bind_quoted: [definition: definition] do
       Parser.Macros.build_node_processors definition.nodes
 
-      def process_lines([source_line | rest]) do
-        source =
-          if (unquote(definition.root_value) != nil) do
-            Map.put(%__MODULE__{}, unquote(definition.root_value), source_line.value)
-          else
-            %__MODULE__{}
-          end
-
-        process_lines(rest, source_line.level, source)
+      def process_lines([source_line | rest] = lines) do
+        state = %__MODULE__{}
+        is_record? = Map.has_key?(state, :id)
+        state = if is_record?, do: Map.put(state, :id, source_line.xref_id), else: state
+        state = if unquote(definition.root_value) != nil, do: Map.put(state, unquote(definition.root_value), source_line.value), else: state
+        process_lines(rest, source_line.level, state)
       end
 
       defp process_lines([], _parent_level, source), do: {[], source}
@@ -44,5 +45,4 @@ defmodule Parser.Macros do
       end
     end
   end
-
 end

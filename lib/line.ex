@@ -8,7 +8,7 @@ defmodule Parser.Line do
     value: String.t
   }
 
-  @regex ~r/(?<level>\d+) (?<xref_id>@[\w]+@)? ?(?<tag>\w+)(?<value>.*+)?/
+  @regex ~r/(?<level>\d+) (@(?<xref_id>[\w]+)@)? ?(?<tag>\w+)(?<value>.*+)?/
 
   def from_string(string) do
     captures = Regex.named_captures(@regex, string, capture: :all_but_first)
